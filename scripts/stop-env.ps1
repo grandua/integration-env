@@ -2,18 +2,14 @@
 Write-Host "Stopping AteraDb + MindsDB environment..."
 docker compose down -v
 
-# Forcefully remove any orphaned container with the same name to prevent conflicts
+# Forcefully remove specific containers if they exist to prevent name conflicts
 Write-Host "Checking for orphaned containers..."
-$containerId = docker ps -a -q --filter "name=atera_postgres"
-if ($containerId) {
-    Write-Host "Found and removing orphaned container: atera_postgres ($containerId)"
-    docker rm -f $containerId
-}
-
-$mindsdbContainerId = docker ps -a -q --filter "name=mindsdb_instance"
-if ($mindsdbContainerId) {
-    Write-Host "Found and removing orphaned container: mindsdb_instance ($mindsdbContainerId)"
-    docker rm -f $mindsdbContainerId
+$orphanedContainers = @("mindsdb_instance")
+foreach ($container in $orphanedContainers) {
+    if (docker ps -a --format '{{.Names}}' | Select-String -Quiet $container) {
+        Write-Host "Found and removing orphaned container: $container"
+        docker rm -f $(docker ps -a -q --filter "name=$container")
+    }
 }
 
 Write-Host "Cleanup complete."
