@@ -1,0 +1,17 @@
+# Example override for local development (do not commit as docker-compose.override.yml)
+services:
+  postgres:
+    build:
+      context: ../AteraMcpServer
+      dockerfile: Dockerfile-db
+    image: ateracorp/atera-db:local
+    # Uncomment below to mount source for live reload (if needed)
+    # volumes:
+    #   - ../AteraMcpServer/src:/app/src
+
+  mindsdb:
+    # The MindsDB service uses the standard image. We don't build a custom one.
+    # Instead, we mount the local configuration scripts into the container
+    # to allow for hot-reloading if you change them.
+    volumes:
+      - ../AteraMindsDbMcpServer/deploy:/app/config

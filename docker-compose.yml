@@ -1,0 +1,28 @@
+services:
+  postgres:
+    image: ateracorp/atera-db:${ATERA_DB_TAG:-latest}
+    container_name: atera_postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "atera_user"]
+      interval: 5s
+      retries: 10
+    environment:
+      POSTGRES_PASSWORD: atera_password
+    networks: [atera-net]
+    volumes: [atera-data:/var/lib/postgresql/data]
+
+  mindsdb:
+    image: ateracorp/atera-mindsdb:${MINDSDB_TAG:-latest}
+    container_name: mindsdb_instance
+    depends_on: [postgres]
+    ports:
+      - "47334:47334"
+      - "47335:47335"
+      - "47337:47337"
+    networks: [atera-net]
+
+networks:
+  atera-net:
+
+volumes:
+  atera-data:
