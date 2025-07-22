@@ -1,24 +1,14 @@
 # Start the integration environment
 Write-Host "Starting AteraDb + MindsDB environment..."
-docker compose up -d
-
-# Wait for health (optional enhancement)
-Write-Host "Waiting for containers to be healthy..."
-$healthy = $false
-for ($i = 0; $i -lt 30; $i++) {
-    $ps = docker ps --filter "health=healthy" --filter "name=postgres" --format "{{.Names}}"
-    $ms = docker ps --filter "health=healthy" --filter "name=mindsdb_instance" --format "{{.Names}}"
-    if ($ps -and $ms) {
-        Write-Host "All services are healthy."
-        $healthy = $true
-        break
-    }
-    Start-Sleep -Seconds 2
-}
-if (-not $healthy) { 
-    Write-Host "Warning: Not all services are healthy after timeout." 
+# Use the --wait flag to let Docker Compose handle waiting for healthy containers.
+# This is the most reliable method and removes our brittle, manual polling loop.
+docker compose up -d --wait
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "One or more containers failed to start or become healthy. Aborting."
     exit 1
 }
+
+Write-Host "All services are healthy."
 
 # Apply EF Core migrations from the host to the container.
 # We construct the connection string here and pass it directly to the tool.
