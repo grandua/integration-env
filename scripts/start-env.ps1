@@ -20,17 +20,17 @@ if (-not $healthy) {
     exit 1
 }
 
-# Apply EF Core Migrations from the host
+# Apply EF Core migrations from the host to the container.
+# We construct the connection string here and pass it directly to the tool.
+# This is the most robust method as it overrides any appsettings.json configuration,
+# ensuring the host-based tool connects to localhost where the container port is mapped.
 Write-Host "Applying EF Core migrations..."
-$ateraMcpPath = "..\..\AteraMcpServer"
-if (Test-Path $ateraMcpPath) {
-    Push-Location $ateraMcpPath
-    dotnet ef database update --project AteraDb.DataAccess
-    Pop-Location
-} else {
-    Write-Host "Error: AteraMcpServer project not found at $ateraMcpPath"
-    exit 1
-}
+$ateraMcpServerProjectDir = Join-Path $PSScriptRoot "..\..\AteraMcpServer"
+$connectionString = "Host=localhost;Port=5432;Database=atera_prod;Username=atera_user;Password=atera_password"
+
+dotnet ef database update --project $ateraMcpServerProjectDir --startup-project $ateraMcpServerProjectDir --connection $connectionString
+
+Write-Host "EF Core migrations applied successfully."
 
 # Configure MindsDB
 Write-Host "Configuring MindsDB..."
