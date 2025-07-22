@@ -7,7 +7,7 @@ Write-Host "Waiting for containers to be healthy..."
 $healthy = $false
 for ($i = 0; $i -lt 30; $i++) {
     $ps = docker ps --filter "health=healthy" --filter "name=postgres" --format "{{.Names}}"
-    $ms = docker ps --filter "status=running" --filter "name=mindsdb_instance" --format "{{.Names}}"
+    $ms = docker ps --filter "health=healthy" --filter "name=mindsdb_instance" --format "{{.Names}}"
     if ($ps -and $ms) {
         Write-Host "All services are healthy."
         $healthy = $true
