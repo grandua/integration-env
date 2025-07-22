@@ -25,6 +25,31 @@ if (-not $healthy) {
 # This is the most robust method as it overrides any appsettings.json configuration,
 # ensuring the host-based tool connects to localhost where the container port is mapped.
 Write-Host "Applying EF Core migrations..."
+
+# Add a retry loop to wait for the database to be ready to accept connections from the host.
+# This prevents a race condition where the container is 'healthy' but not yet listening on the mapped port.
+Write-Host "Waiting for PostgreSQL to be ready..."
+$maxRetries = 15
+$retryIntervalSeconds = 2
+for ($i = 1; $i -le $maxRetries; $i++) {
+    try {
+        $tcpClient = New-Object System.Net.Sockets.TcpClient
+        $tcpClient.Connect('localhost', 5432)
+        if ($tcpClient.Connected) {
+            Write-Host "PostgreSQL is ready!"
+            $tcpClient.Close()
+            break
+        }
+    } catch {
+        Write-Host "Attempt $i of ${maxRetries}: PostgreSQL not ready yet. Retrying in $retryIntervalSeconds seconds..."
+        Start-Sleep -Seconds $retryIntervalSeconds
+    }
+    if ($i -eq $maxRetries) {
+        Write-Error "Failed to connect to PostgreSQL after $maxRetries attempts. Aborting."
+        exit 1
+    }
+}
+
 $ateraMcpServerProjectDir = Join-Path $PSScriptRoot "..\..\AteraMcpServer"
 $migrationsProject = Join-Path $ateraMcpServerProjectDir "AteraDb.DataAccess"
 $connectionString = "Host=localhost;Port=5432;Database=atera_prod;Username=atera_user;Password=atera_password"
