@@ -30,6 +30,8 @@ services:
       timeout: 5s
       retries: 10
       start_period: 40s
+    environment:
+      - MINDSDB_APIS=http,mysql,mcp
     networks: [atera-net]
 
 networks:
