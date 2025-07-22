@@ -17,11 +17,19 @@ services:
   mindsdb:
     image: ateracorp/atera-mindsdb:${MINDSDB_TAG:-latest}
     container_name: mindsdb_instance
-    depends_on: [postgres]
+    depends_on:
+      postgres:
+        condition: service_healthy
     ports:
       - "47334:47334"
       - "47335:47335"
       - "47337:47337"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:47334/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
     networks: [atera-net]
 
 networks:
