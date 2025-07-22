@@ -2,11 +2,14 @@ services:
   postgres:
     image: ateracorp/atera-db:${ATERA_DB_TAG:-latest}
     container_name: atera_postgres
+    ports:
+      - "5432:5432"
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "atera_user"]
       interval: 5s
       retries: 10
     environment:
+      POSTGRES_USER: atera_user
       POSTGRES_PASSWORD: atera_password
     networks: [atera-net]
     volumes: [atera-data:/var/lib/postgresql/data]
