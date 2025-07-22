@@ -25,7 +25,7 @@ services:
       - "47335:47335"
       - "47337:47337"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:47334/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:47334/"]
       interval: 10s
       timeout: 5s
       retries: 10
