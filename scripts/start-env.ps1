@@ -50,7 +50,7 @@ Write-Host "EF Core migrations applied successfully."
 
 # Configure MindsDB
 Write-Host "Configuring MindsDB..."
-$configScriptPath = "..\..\AteraMindsDbMcpServer\deploy\mindsdb-config.ps1"
+$configScriptPath = Join-Path $PSScriptRoot "..\..\AteraMindsDbMcpServer\deploy\mindsdb-config.ps1"
 if (Test-Path $configScriptPath) {
     & $configScriptPath
 } else {
