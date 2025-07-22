@@ -1,6 +1,7 @@
 # Stop and clean up the integration environment
 Write-Host "Stopping AteraDb + MindsDB environment..."
-docker compose down -v
+# Note: Use "docker compose down -v" to reset Docker volume for DB to an empty DB
+docker compose down
 
 # Forcefully remove specific containers if they exist to prevent name conflicts
 Write-Host "Checking for orphaned containers..."
