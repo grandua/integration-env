@@ -52,7 +52,7 @@ for ($i = 1; $i -le $maxRetries; $i++) {
 
 $ateraMcpServerProjectDir = Join-Path $PSScriptRoot "..\..\AteraMcpServer"
 $migrationsProject = Join-Path $ateraMcpServerProjectDir "AteraDb.DataAccess"
-$connectionString = "Host=localhost;Port=5432;Database=atera_prod;Username=atera_user;Password=atera_password"
+$connectionString = "Host=localhost;Port=5432;Database=AteraDb;Username=atera_user;Password=atera_password"
 
 dotnet ef database update --project $migrationsProject --startup-project $migrationsProject --connection $connectionString
 
