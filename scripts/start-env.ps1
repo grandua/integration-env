@@ -26,9 +26,10 @@ if (-not $healthy) {
 # ensuring the host-based tool connects to localhost where the container port is mapped.
 Write-Host "Applying EF Core migrations..."
 $ateraMcpServerProjectDir = Join-Path $PSScriptRoot "..\..\AteraMcpServer"
+$migrationsProject = Join-Path $ateraMcpServerProjectDir "AteraDb.DataAccess"
 $connectionString = "Host=localhost;Port=5432;Database=atera_prod;Username=atera_user;Password=atera_password"
 
-dotnet ef database update --project $ateraMcpServerProjectDir --startup-project $ateraMcpServerProjectDir --connection $connectionString
+dotnet ef database update --project $migrationsProject --startup-project $migrationsProject --connection $connectionString
 
 Write-Host "EF Core migrations applied successfully."
 
