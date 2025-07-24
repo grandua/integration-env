@@ -1,4 +1,5 @@
 # Example override for local development (do not commit as docker-compose.override.yml)
+# This file is for local development overrides only - do not distribute it to my client.
 services:
   postgres:
     build:
