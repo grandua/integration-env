@@ -1,0 +1,1 @@
+docker compose up -d atera-dbsync --no-deps

@@ -1,0 +1,25 @@
+# docker-compose.override.yml
+# This file is for local development overrides - do not distribute it to my client.
+
+services:
+  postgres:
+    # For local development, we use the standard public PostgreSQL image.
+    # Migrations will be applied from the host machine after the container starts.
+    image: postgres:16
+
+  mindsdb:
+    # For local development, we use the standard public MindsDB image.
+    image: mindsdb/mindsdb
+    # We mount our local configuration scripts into the container
+    # to allow for hot-reloading if you change them.
+    volumes:
+      - ../AteraMindsDbMcpServer/deploy:/app/config
+
+  atera-dbsync:
+    build:
+      context: ../AteraMcpServer
+      dockerfile: AteraDb.Sync/Dockerfile
+    environment:
+      - ConnectionStrings__AteraDb=Host=postgres;Port=5432;Database=AteraDb;Username=atera_user;Password=atera_password
+      - SyncOptions__IncrementalSyncIntervalMinutes=5
+      - OtlpExporter__Endpoint=

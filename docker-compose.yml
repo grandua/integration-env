@@ -34,6 +34,18 @@ services:
       - MINDSDB_APIS=http,mysql,mcp
     networks: [atera-net]
 
+  atera-dbsync:
+    image: ateracorp/atera-db-sync:${ATERA_DB_SYNC_TAG:-latest}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__AteraDb=Host=postgres;Port=5432;Database=AteraDb;Username=atera_user;Password=atera_password
+      - Atera__ApiKey=${ATERA_API_KEY}
+      - SyncOptions__IncrementalSyncIntervalMinutes=5
+      - OtlpExporter__Endpoint=
+    networks: [atera-net]
+
 networks:
   atera-net:
 
