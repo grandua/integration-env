@@ -10,16 +10,26 @@ services:
   mindsdb:
     # For local development, we use the standard public MindsDB image.
     image: mindsdb/mindsdb
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     # We mount our local configuration scripts into the container
     # to allow for hot-reloading if you change them.
     volumes:
       - ../AteraMindsDbMcpServer/deploy:/app/config
+      - ./scripts/mindsdb-healthcheck.sh:/healthcheck.sh:ro
+    healthcheck:
+      test: ["CMD", "bash", "/healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   atera-dbsync:
     build:
       context: ../AteraMcpServer
       dockerfile: AteraDb.Sync/Dockerfile
     environment:
-      - ConnectionStrings__AteraDb=Host=postgres;Port=5432;Database=AteraDb;Username=atera_user;Password=atera_password
+      - ConnectionStrings__AteraDb=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       - SyncOptions__IncrementalSyncIntervalMinutes=5
       - OtlpExporter__Endpoint=

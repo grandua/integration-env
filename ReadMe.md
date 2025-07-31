@@ -31,7 +31,8 @@ configured, and run together.
 **One-Time Setup:**
 
 1.  Navigate to the `integration-env` directory.
-2.  Rename `docker-compose.override.yml.example` to `docker-compose.override.yml`. This file is ignored by Git and is specific to your local machine.
+2.  Copy `docker-compose.override.yml.example` to `docker-compose.override.yml`. This file is ignored by Git and is specific to your local machine.
+3.  Copy `.env.example` to `.env` and update the values with your specific environment variables (e.g., API keys, database credentials). This file is also ignored by Git for security.
 
 **Daily Workflow:**
 
