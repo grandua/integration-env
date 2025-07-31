@@ -1,5 +1,5 @@
 $payload = @{
-    query = "SHOW TABLES FROM AteraDb;"
+    query = "SHOW TABLES FROM atera_prod;"
 } | ConvertTo-Json
 
 try {
