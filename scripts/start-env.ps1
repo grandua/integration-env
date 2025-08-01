@@ -55,7 +55,15 @@ if (Test-Path $configScriptPath) {
     Write-Host "DEBUG (start-env.ps1): POSTGRES_DB = '$env:POSTGRES_DB'"
     Write-Host "DEBUG (start-env.ps1): POSTGRES_USER = '$env:POSTGRES_USER'"
     Write-Host "DEBUG (start-env.ps1): POSTGRES_PASSWORD = '$env:POSTGRES_PASSWORD'"
-    & $configScriptPath
+    
+    # Pass environment variables explicitly
+    $envVars = @{
+        POSTGRES_DB = $env:POSTGRES_DB
+        POSTGRES_USER = $env:POSTGRES_USER
+        POSTGRES_PASSWORD = $env:POSTGRES_PASSWORD
+    }
+    
+    & $configScriptPath @envVars
 } else {
     Write-Host "Error: Configuration script not found at $configScriptPath"
     exit 1
