@@ -99,54 +99,33 @@ try {
     }
 }
 
-# --- 2. Create Agents and Skills (Idempotent) ---
-Write-Host "Checking for existing agent: $agentName..."
+# --- 2. Drop Existing Agent (to force recreation of agent and skills) ---
+Write-Host "Attempting to drop existing agent: $agentName to ensure latest skills are applied..."
+try {
+    # We don't need to check if it exists first. A 404 on DELETE is not a failure.
+    Invoke-RestMethod -Uri "$baseApiUrl/models/$agentName" -Method Delete -ErrorAction SilentlyContinue | Out-Null
+    Write-Host "Agent '$agentName' dropped if it existed. Proceeding to creation."
+} catch {
+    # Even if there's an error, we can proceed, as the creation step will likely fail if the agent is in a bad state.
+    Write-Warning "An error occurred while trying to drop agent '$agentName': $($_.Exception.Message). Continuing to creation step..."
+}
 
-# Drop existing agent and skills to ensure fresh creation with updated parameters
-Write-Host "Attempting to drop existing agent and skills..."
-$dropSqlScriptPath = Join-Path $PSScriptRoot "..\..\AteraMindsDbMcpServer\deploy\drop-mindsdb-agents-and-skills.sql"
+# --- 3. Create Agent and Skills ---
+Write-Host "Creating Agent and Skills from SQL file..."
+$sqlScriptPath = Join-Path $PSScriptRoot "..\..\AteraMindsDbMcpServer\deploy\create-mindsdb-agents-and-skills.sql"
 $executeSqlScriptPath = Join-Path $PSScriptRoot "..\..\AteraMindsDbMcpServer\scripts\Execute-MindsDbSqlScript.ps1"
 
-if (Test-Path $dropSqlScriptPath) {
+if (Test-Path $sqlScriptPath) {
     if (Test-Path $executeSqlScriptPath) {
-        & $executeSqlScriptPath -SqlFilePath $dropSqlScriptPath
-        Write-Host "Existing MindsDB Agents and Skills dropped (if they existed)."
+        & $executeSqlScriptPath -SqlFilePath $sqlScriptPath
+        Write-Host "MindsDB Agents and Skills creation process initiated successfully."
     } else {
-        Write-Warning "Execute-MindsDbSqlScript.ps1 not found at $executeSqlScriptPath. Cannot drop existing agents/skills."
-    }
-} else {
-    Write-Warning "drop-mindsdb-agents-and-skills.sql not found at $dropSqlScriptPath. Cannot drop existing agents/skills."
-}
-
-$agentExists = $false
-try {
-    $agentQueryResult = Invoke-RestMethod -Uri "$baseApiUrl/sql/query" -Method Post -Body (@{ query = "SHOW AGENTS;" } | ConvertTo-Json) -ContentType 'application/json'
-    if ($agentQueryResult.data | Where-Object { $_[0] -eq $agentName }) {
-        $agentExists = $true
-    }
-} catch {
-    Write-Warning "Could not check for existing agent: $($_.Exception.Message)"
-}
-
-if ($agentExists) {
-    Write-Host "Agent '$agentName' already exists. Skipping creation."
-} else {
-    Write-Host "Agent not found. Creating..."
-    $sqlScriptPath = Join-Path $PSScriptRoot "..\..\AteraMindsDbMcpServer\deploy\create-mindsdb-agents-and-skills.sql"
-    $executeSqlScriptPath = Join-Path $PSScriptRoot "..\..\AteraMindsDbMcpServer\scripts\Execute-MindsDbSqlScript.ps1"
-
-    if (Test-Path $sqlScriptPath) {
-        if (Test-Path $executeSqlScriptPath) {
-            & $executeSqlScriptPath -SqlFilePath $sqlScriptPath
-            Write-Host "MindsDB Agents and Skills creation process initiated."
-        } else {
-            Write-Error "Execute-MindsDbSqlScript.ps1 not found at $executeSqlScriptPath"
-            exit 1
-        }
-    } else {
-        Write-Error "create-mindsdb-agents-and-skills.sql not found at $sqlScriptPath"
+        Write-Error "Execute-MindsDbSqlScript.ps1 not found at $executeSqlScriptPath"
         exit 1
     }
+} else {
+    Write-Error "create-mindsdb-agents-and-skills.sql not found at $sqlScriptPath"
+    exit 1
 }
 
 # Check for existing skills and create if not present
