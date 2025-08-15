@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: ateracorp/atera-db:${ATERA_DB_TAG:-latest}
+    image: ghcr.io/grandua/atera-db:${ATERA_DB_TAG:-latest}
     ports:
       - "5432:5432"
     healthcheck:
@@ -15,7 +15,7 @@ services:
     volumes: [atera-data:/var/lib/postgresql/data]
 
   mindsdb:
-    image: ateracorp/atera-mindsdb:${MINDSDB_TAG:-latest}
+    image: ghcr.io/grandua/atera-mindsdb:${MINDSDB_TAG:-latest}
     container_name: mindsdb_instance
     depends_on:
       postgres:
@@ -38,7 +38,7 @@ services:
     networks: [atera-net]
 
   atera-dbsync:
-    image: ateracorp/atera-db-sync:${ATERA_DB_SYNC_TAG:-latest}
+    image: ghcr.io/grandua/atera-db-sync:${ATERA_DB_SYNC_TAG:-latest}
     depends_on:
       postgres:
         condition: service_healthy
