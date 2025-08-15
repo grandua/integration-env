@@ -44,6 +44,10 @@ $migrationsProject = Join-Path $ateraMcpServerProjectDir "AteraDb.DataAccess"
 $connectionString = "Host=localhost;Port=5432;Database=$env:POSTGRES_DB;Username=$env:POSTGRES_USER;Password=$env:POSTGRES_PASSWORD"
 
 dotnet ef database update --project $migrationsProject --startup-project $migrationsProject --connection $connectionString
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "EF migrations failed. Aborting."
+    exit $LASTEXITCODE
+}
 
 Write-Host "EF Core migrations applied successfully."
 

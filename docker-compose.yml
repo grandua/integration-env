@@ -45,7 +45,9 @@ services:
     environment:
       - ConnectionStrings__AteraDb=Host=postgres;Port=5432;Database=AteraDb;Username=atera_user;Password=atera_password
       - Atera__ApiKey=${ATERA_API_KEY}
-      - SyncOptions__IncrementalSyncIntervalMinutes=5
+      - SyncOptions__IncrementalSyncIntervalMinutes=${SYNC_INCREMENTAL_MINUTES:-5}
+      - SyncOptions__TicketOnlySyncIntervalMinutes=${SYNC_TICKET_ONLY_MINUTES:-1440}
+      - SyncOptions__TicketCommentsAlertsSyncIntervalMinutes=${SYNC_TICKET_COMMENTS_ALERTS_MINUTES:-10080}
       - OtlpExporter__Endpoint=
     networks: [atera-net]
 

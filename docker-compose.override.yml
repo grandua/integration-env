@@ -31,5 +31,7 @@ services:
       dockerfile: AteraDb.Sync/Dockerfile
     environment:
       - ConnectionStrings__AteraDb=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-      - SyncOptions__IncrementalSyncIntervalMinutes=5
+      - SyncOptions__IncrementalSyncIntervalMinutes=${SYNC_INCREMENTAL_MINUTES:-5}
+      - SyncOptions__TicketOnlySyncIntervalMinutes=${SYNC_TICKET_ONLY_MINUTES:-1440}
+      - SyncOptions__TicketCommentsAlertsSyncIntervalMinutes=${SYNC_TICKET_COMMENTS_ALERTS_MINUTES:-10080}
       - OtlpExporter__Endpoint=
