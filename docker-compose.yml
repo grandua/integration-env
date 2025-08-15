@@ -8,9 +8,9 @@ services:
       interval: 5s
       retries: 10
     environment:
-      POSTGRES_USER: atera_user
-      POSTGRES_PASSWORD: atera_password
-      POSTGRES_DB: AteraDb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     networks: [atera-net]
     volumes: [atera-data:/var/lib/postgresql/data]
 
@@ -43,7 +43,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      - ConnectionStrings__AteraDb=Host=postgres;Port=5432;Database=AteraDb;Username=atera_user;Password=atera_password
+      - ConnectionStrings__AteraDb=Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       - Atera__ApiKey=${ATERA_API_KEY}
       - SyncOptions__IncrementalSyncIntervalMinutes=${SYNC_INCREMENTAL_MINUTES:-5}
       - SyncOptions__TicketOnlySyncIntervalMinutes=${SYNC_TICKET_ONLY_MINUTES:-1440}
